@@ -1,0 +1,22 @@
+Prefer to set all values that use only part of a register, esp. ones where you use only a part of the register to a known (0?) value
+Check all arguments before making a function call - e.g. for futex - you *must* zero out the timestruct
+When constructing a large program, never keep things in your head, jot them down as todos as soon as they occur to you
+Make sure that all functions return
+Make sure to always pop off everything that you pushii
+
+Remember to set the return value in rax fo
+
+Never refer to registers by their names unless its for initialization - always use macros or the stack
+
+Pay close attention to the size of the operands and registers used
+
+Prefer using the callee's registers unless you don't make any calls in the function
+Prefer the stack over raw registers because you have to either save them between calls or restore them at the end depending on which set you use
+
+Always provide signature types in definitions.
+Always state your invariants and provide asserts
+
+Perform error checking on operations
+
+Sometimes arguments need to be page aligned - futex
+Always perform error handling after every operation

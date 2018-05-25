@@ -1,0 +1,2 @@
+f_lang.s syscalls.s assert.s threads.s test_syscalls.s lock.s
+ld out/*.o -o test_syscalls
