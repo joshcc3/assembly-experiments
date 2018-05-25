@@ -8,7 +8,7 @@ target/%.o: src/%.s
 	mkdir -p $(dir $@)
 	nasm -f elf64 -g -F dwarf -i src/ $^ -o $@
 
-target/map_reduce/map_reduce: $(MAP_REDUCE_OBJFILES) target/map_reduce/start.o
+target/map_reduce/map_reduce: $(MAP_REDUCE_OBJFILES)
 	mkdir -p target/map_reduce
 	ld -o $@ $^
 
