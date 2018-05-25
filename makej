@@ -1,5 +1,0 @@
-nasm -f elf64 -i . -g -F dwarf f_lang.s -o out/f_lang.o
-nasm -f elf64 -i . -g -F dwarf threads.s -o out/threads.o 
-nasm -f elf64 -i . -g -F dwarf simple_concurrent.s -o out/simple_concurrent.o 
-nasm -f elf64 -i . -g -F dwarf syscalls.s -o out/syscalls.o 
-ld out/simple_concurrent.o out/threads.o out/f_lang.o out/syscalls.o -o simple_concurrent

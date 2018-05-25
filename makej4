@@ -1,8 +1,0 @@
-nasm -f elf64 -i . -g -F dwarf f_lang.s -o out4/f_lang.o
-nasm -f elf64 -i . -g -F dwarf syscalls.s -o out4/syscalls.o 
-nasm -f elf64 -i . -g -F dwarf assert.s -o out4/assert.o 
-nasm -f elf64 -i . -g -F dwarf threads.s -o out4/threads.o 
-nasm -f elf64 -i . -g -F dwarf data/maybe.s -o out4/maybe.o 
-nasm -f elf64 -i . -g -F dwarf data/test_data.s -o out4/test_data.o 
-nasm -f elf64 -i . -g -F dwarf lock.s -o out4/lock.o 
-ld out4/*.o -o test_dat
