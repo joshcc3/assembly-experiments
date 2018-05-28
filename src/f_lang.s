@@ -15,7 +15,7 @@ global fmt_n_bytes
 global print_new_line	
 global cp_bytes	
 global print
-
+global printerr_new_line
 	
 section .data
 	def_str string_too_large, `strlen of a string that was too large.\n`
@@ -284,3 +284,13 @@ print_new_line:
 	
 	epilogue 0
 
+printerr_new_line:
+	prologue 0
+	
+	push 10
+	mov rdi, rsp
+	mov rsi, 2
+	call print
+	pop rdi
+	
+	epilogue 0

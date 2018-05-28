@@ -3,6 +3,7 @@ global sys_exit
 global sys_futex
 global sys_open	
 global sys_getdents
+global sys_close
 
 
 sys_exit:
@@ -26,5 +27,10 @@ sys_open:
 	
 sys_getdents:
 	mov rax, 78
+	syscall
+	ret
+
+sys_close:
+	mov rax, 3
 	syscall
 	ret

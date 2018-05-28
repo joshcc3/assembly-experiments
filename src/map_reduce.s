@@ -6,10 +6,12 @@
 %include "string.i"
 %include "threads.i"
 %include "heap.i"
+%include "lock.i"
 	
 global _start
 
-
+section .bss
+stdout_lock resq 1
 
 section .data
 def_str filename_prompt, `Filename: \0`
@@ -21,7 +23,7 @@ def_str str2, `2: This is string2\0`
 def_str dir_msg, `Encountering Directory: \0`
 def_str no_args_msg, `Usage: ./map_reduce <root_dir>\n\0`
 
-%define BUF_SIZE 0x1000
+%define BUF_SIZE 0x1000		; Size of the buffer to read in directory entries - 1 page can fit about 40 dir entries - 80 char filepath + 20 bytes for other dirent info
 	
 
 
@@ -43,6 +45,9 @@ visit_dir:
 	
 	mov rdi, cur_dir
 	call open_dir
+	cmp rax, 0
+	jl .error_opening_dir
+
 	mov r12, rax		; r12 fd
 	
 	sub rsp, BUF_SIZE
@@ -81,11 +86,33 @@ visit_dir:
 	
 	.done:
 
+	mov rdi, fd
+	call sys_close
+
 	add rsp, BUF_SIZE
 	pop r13
 	pop r12
 	epilogue 32
 
+.error_opening_dir:
+	mov rdi, stdout_lock
+	call acquire	
+
+	mov rdi, r13
+	call stringlen
+	mov rdi, r13
+	mov rsi, rax
+	call printerr
+	call printerr_new_line
+
+	mov rdi, stdout_lock
+	call release
+
+	mov rdi, .error_opening_dir_msg
+	mov rsi, .error_opening_dir_msg
+	call assert_false
+
+.error_opening_dir_msg: db `Error opening directory\n\0`
 
 
 next_fname:
@@ -226,14 +253,20 @@ handle_dirname:
 	
 
 	
+	mov rdi, stdout_lock
+	call acquire
+
 	;;  Print a processing message
 	mov rdi, dir_msg
 	mov rsi, dir_msg_len
 	call print
 
-	mov rdi, r12		; print the diranem 
+	mov rdi, r12		; print the dirname
 	mov rsi, r13
 	call println
+
+	mov rdi, stdout_lock
+	call release
 
 
 	mov rdi, r13		; 'malloc' r13 bytes
@@ -264,6 +297,9 @@ handle_fname:
 	mov r12, rdi
 	mov r13, rsi
 	
+	mov rdi, stdout_lock
+	call acquire
+
 	mov rdi, processing_message
 	mov rsi, processing_message_len
 	call print
@@ -271,6 +307,9 @@ handle_fname:
 	mov rdi, r12
 	mov rsi, r13
 	call println
+	
+	mov rdi, stdout_lock
+	call release
 
 	pop r13
 	pop r12

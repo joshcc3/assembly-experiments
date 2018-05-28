@@ -21,7 +21,7 @@ init_heap:
 	prologue 0
 	
 	mov rax, 9
-	mov rdi, NULL		            ; Let the kernel choose where to put the stack
+	mov rdi, NULL		            ; Let the kernel choose where to put the heap :/
 	mov rsi, HEAP_SIZE
 	mov rdx, PROT_WRITE | PROT_READ
 
@@ -45,7 +45,7 @@ malloc:
 	mov r13, rdi
 	
 	
-	mov rdi, heap_lock	; could use the cmpxchg straight on the heap_ptr instead of going through a lock
+	mov rdi, heap_lock	
 	call acquire
 	mov r14, [heap_ptr]	; save space and read the ptr into r14
 	add [heap_ptr], r13	

@@ -9,7 +9,7 @@ global sleep
 global thread_create
 global wait_for_completion	
 	
-%define max_threads 0x100
+%define max_threads 0x1000000
 section .bss
 	align 4
 	futex_table resd max_threads   ; 2^16 threads ever - no garbage collection in this space yet
@@ -135,7 +135,7 @@ thread_create:
 	
   cmp rax, 0
 
-	jne .parent
+  jne .parent
   %define child_tid r13
   .child:
 	

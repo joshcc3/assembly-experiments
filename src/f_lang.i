@@ -15,7 +15,7 @@ extern fmt_n_bytes
 extern print_new_line
 extern cp_bytes
 extern print
-
+extern printerr_new_line
 
 %define long 32
 %define short 16

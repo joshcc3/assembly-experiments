@@ -7,6 +7,7 @@ extern sys_futex
 extern sys_exit
 extern sys_open
 extern sys_getdents
+extern sys_close
 
 ; From https://github.com/torvalds/linux/blob/ead751507de86d90fa250431e9990a8b881f713c/tools/arch/alpha/include/uapi/asm/mman.h
 %define PROT_READ 0x0
