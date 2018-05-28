@@ -1,19 +1,19 @@
-Concurrent File Traversal in Assembly
--------------------------------------
+# Concurrent File Traversal in Assembly
 
-# Build
-make in the root directory.
+
+## Build
+`make` in the root directory.
 If providing your own file, directory handlers then delete the 
 
-# Run
-./target/map_reduce/map_reduce <dir>
+## Run
+`./target/map_reduce/map_reduce <dir>`
 
 
 
-# Implementation
+## Implementation
 Traverses the file system and submits directory names to a provided directory handler and filenames to a file handler. I didn't use an actual heap but just passed around references to the stack. As a consequence passing arguments to threads is impossible(?). So instead I use a memory map for shared memory (you can use flags that allow the OS to optimize its treament since it's thread local). I spawn a new thread for every new directory encountered.
 
-## Threads
+### Threads
 
 Threads are implemented with the clone syscall which takes a pointer to the top of the stack and some flags (fork is implemented in terms of clone and the flags are used to determine if the forked process is treated as a thread or not).
 Threads - has a global tid, unique across all tids/pids of existing threads/processes on the system. It is part of a thread group and shares the same pid as its peers. Threads (depending on what flags are passed to clone) will share the virtual memory, file system meta info, file handlers, interrupt handlers and other things with the originating process. It has its own registers and thread local memory. 
@@ -24,25 +24,25 @@ The clone syscall returns to the address at the top of its own stack so this (it
 I use a table in `.bss` to keep track of a futex per thread to be used for waiting on thread exit.
 
 
-## File Traversal
+### File Traversal
 `getdents` is the syscall for retrieving directory information. You call it on a file descriptor corresponding to an open directory. It fills a (provided) buffer with an array of directory entries (containing the directory name, inode and file type).
 `open`, opens a file for reading (you can specify whether it's a temp file/must be a directory and various   other things).
 
-## Locks
-### cmpxchg
+### Locks
+#### cmpxchg
 This is an assembly instruction implementing compare and swap. ( src <- dest if rax == src else rax <- src atomically). I think the docs are misleading (wrong?) on this.
 
-### Futex
+#### Futex
 Futexes are a syscall that allow fast userspace locking. It supports multiple operations, I use the simplest ones WAIT and WAKE. WAIT sleeps on a futex (a 32 bit value in memory) if the value at that location matches the argument provided to the syscall until a WAKE (just takes the address of the syscall) has been called on the futex.
 
-### My Locks
+#### My Locks
 I implemented a simple version of locks with 2 states, 0 - unlocked; 1 - locked.
 `cmpxchg` does a compare and swap  on the lock (compares the src - the lock - with 0 and sets it to 1, otherwise sets rax with the lock value). If the operation fails (wasn't able to lock because it's already locked - detected by checking if rax has changed) then sleep on the lock (futex) of 1. Do this until the lock is acquired.
 
 There are other more efficient implementations:
 
-#### Avoid unnecessary calls to  WAKE:
-(Taken from (here)[https://github.com/winstonli/nihserver])
+##### Avoid unnecessary calls to  WAKE:
+(Taken from [here](https://github.com/winstonli/nihserver))
 
 To lock:
 
@@ -58,7 +58,7 @@ To unlock:
 This has the advantage that we don't call WAKE if the lock is uncontended.
 
 
-#### No wake even in a contended  case
+##### No wake even in a contended  case
 
 To lock:
     - 00: 10 - locked and uncontended atomically, if it fails then loop
@@ -78,7 +78,7 @@ We eliminate another case of an unecessary wakeup here by detecting whether anot
 
 
 
-# Notes
+## Notes
 Assemble programs `nasm -f elf64 -i . -g -F dwarf <assembly-file> -o <out>`. This assembles the program as an elf64 executable, includes the current directory for the `%include` directory, adds symbols for debugging via the `dwarf` flag and generates `out`.
 
 All assembly programs start at `_start` which must be exported via `global` for the linker. There must be a single _start function.
@@ -96,7 +96,7 @@ Single line macros `%define`, multi-line macros with `%macro`, `%endmacro`.
 The `call` instruction pushes the return address onto the stack. `jmp $` jumps to the current positions ($, $$ - location of start, location of beginning of section I think).
 
 
-# Debugging
+## Debugging
 
 Run programs in gdb with `gdb <program>`. Run a program with args via `gdb --args <prog> <arg1> <arg2> ...`.
 
@@ -108,14 +108,14 @@ Create a .gdbinit file in a directory for commands used on start up.
 
 
 			    
-# TODO
+## TODO
  - It sometimes deadlocks on large file trees
  - Providing custom implementations of file handlers and directory handling is strange.
  - Need to limit the number of threads active at a point in time.
 
 
 
-# Lessons
+## Lessons
  - Prefer to set all values that use only part of a register, esp. ones where you use only a part of the register to a known (0?) value
  - Check all arguments before making a function call - e.g. for futex - you *must* zero out the timestruct
  - When constructing a large program, never keep things in your head, jot them down as todos as soon as they occur to you
