@@ -61,18 +61,16 @@ This has the advantage that we don't call WAKE if the lock is uncontended.
 ##### No wake even in a contended  case
 
 To lock:
-    - 00: 10 - locked and uncontended atomically, if it fails then loop
-    - 01: Shouldnt happen
-    - 10: -> 11 atomically
-    - 11: Just sleep on the futex
+ - 00: 10 - locked and uncontended atomically, if it fails then loop
+ - 01: Shouldnt happen
+ - 10: -> 11 atomically
+ - 11: Just sleep on the futex
     
-
-
 To unlock:
-    - 00: shouldn't happen
-    - 01: shouldn't happen
-    - 10: atomically set 1 -> 0, no wake ups
-    - 11: atomically set the first 1 -> 0, and wake up a thread only if the value is still 01.
+ - 00: shouldn't happen
+ - 01: shouldn't happen
+ - 10: atomically set 1 -> 0, no wake ups
+ - 11: atomically set the first 1 -> 0, and wake up a thread only if the value is still 01.
 
 We eliminate another case of an unecessary wakeup here by detecting whether another thread has obtained the lock between the time we unlock (set 1 -> 0) and are about to wake someone up.
 
