@@ -1,9 +1,8 @@
 # Concurrent File Traversal in Assembly
-
+A pure assmebly, NIH implementation of concurrent file traversal over a directory tree in assembly (mainly as a learning experience).
 
 ## Build
 `make` in the root directory.
-If providing your own file, directory handlers then delete the 
 
 ## Run
 `./target/map_reduce/map_reduce <dir>`
@@ -11,7 +10,7 @@ If providing your own file, directory handlers then delete the
 
 
 ## Implementation
-Traverses the file system and submits directory names to a provided directory handler and filenames to a file handler. I didn't use an actual heap but just passed around references to the stack. As a consequence passing arguments to threads is impossible(?). So instead I use a memory map for shared memory (you can use flags that allow the OS to optimize its treament since it's thread local). I spawn a new thread for every new directory encountered.
+Traverses the file system and submits directory names to a provided directory handler and filenames to a file handler. I didn't use an actual heap but just passed around references to the stack. As a consequence passing arguments to threads is impossible(?). So instead I use a memory map for shared memory (you can use flags that allow the OS to optimize its treament since it's thread local). I spawn a new thread for every new directory encountered - (TODO, use a thread pool instead)
 
 ### Threads
 
