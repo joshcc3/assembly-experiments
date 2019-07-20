@@ -6,8 +6,86 @@ A pure assmebly, NIH implementation of concurrent file traversal over a director
 
 ## Run
 `./target/map_reduce/map_reduce <dir>`
-
-
+### Example
+```
+root@3c4b04e683cf:~/file-traversal-assembly# ./target/map_reduce/map_reduce .
+Encountering Directory:  ./test
+Processing:  Makefile
+Processing:  README.md
+Processing:  Lessons.txt
+Encountering Directory:  ./.git
+Encountering Directory:  ./target
+Processing:  .gitignore
+Processing:  _config.yml
+Encountering Directory:  ./src
+Processing:  imports.i
+Processing:  string.s
+Processing:  arrays.s
+Processing:  errno.i
+Processing:  f_lang.s
+Processing:  map_reduce.s
+Processing:  fs.i
+Processing:  lock.s
+Processing:  syscalls.i
+Processing:  condition.i
+Processing:  f_lang.i
+Processing:  string.i
+Processing:  heap.i
+Processing:  fs.s
+Processing:  syscalls.s
+Processing:  macros.i
+Processing:  assert.s
+Processing:  threads.i
+Processing:  lock.i
+Processing:  threads.s
+Processing:  heap.s
+Processing:  assert.i
+Processing:  f_lang.o
+Processing:  lock.o
+Processing:  syscalls.o
+Processing:  arrays.o
+Encountering Directory:  ./target/map_reduce
+Processing:  map_reduce.o
+Processing:  string.o
+Processing:  threads.o
+Processing:  heap.o
+Processing:  fs.o
+Processing:  assert.o
+Encountering Directory:  ./.git/logs
+Processing:  config
+Encountering Directory:  ./.git/branches
+Processing:  description
+Encountering Directory:  ./.git/hooks
+Encountering Directory:  ./.git/objects
+Processing:  index
+Encountering Directory:  ./.git/refs
+Encountering Directory:  ./.git/info
+Processing:  HEAD
+Processing:  packed-refs
+Encountering Directory:  ./test/hs
+Encountering Directory:  ./test/resources
+Encountering Directory:  ./test/py
+Encountering Directory:  ./.git/refs/remotes
+Encountering Directory:  ./.git/refs/heads
+Encountering Directory:  ./.git/refs/tags
+Processing:  exclude
+Encountering Directory:  ./.git/objects/pack
+Encountering Directory:  ./.git/objects/info
+Processing:  commit-msg.sample
+Processing:  post-update.sample
+Processing:  prepare-commit-msg.sample
+Processing:  update.sample
+Processing:  pre-receive.sample
+Processing:  pre-rebase.sample
+Processing:  pre-commit.sample
+Processing:  applypatch-msg.sample
+Processing:  pre-applypatch.sample
+Processing:  pre-push.sample
+Processing:  pack-5bf3a18ec32fef360231843613f55ad1a8c57730.idx
+Processing:  pack-5bf3a18ec32fef360231843613f55ad1a8c57730.pack
+Processing:  map_reduce
+...
+```
 
 ## Implementation
 Traverses the file system and submits directory names to a provided directory handler and filenames to a file handler. I didn't use an actual heap but just passed around references to the stack. As a consequence passing arguments to threads is impossible(?). So instead I use a memory map for shared memory (you can use flags that allow the OS to optimize its treament since it's thread local). I spawn a new thread for every new directory encountered - (TODO, use a thread pool instead)
